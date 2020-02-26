@@ -8,10 +8,12 @@ class FirebaseUI{
     constructor(){
 
         if(! FirebaseUI.instance ){
+
             this.ui = new firebaseui.auth.AuthUI(FirebaseGlobal.firebase.auth());
             this.init = this.init.bind(this);
 
             FirebaseUI.instance = this;
+
         }
 
         return FirebaseUI.instance;

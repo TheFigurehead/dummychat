@@ -53,6 +53,12 @@ const Navigation = (props) => {
             to: '/rooms',
             label: 'Rooms',
             icon: <InboxIcon />
+        },
+        {
+            to: '/',
+            label: 'Log out',
+            icon: <InboxIcon />,
+            handler: FirebaseGlobal.userSignOut
         }
     ];
   
@@ -62,7 +68,7 @@ const Navigation = (props) => {
         <Divider />
         <List>
           {MainList.map((item, index) => (
-            <Link to={item.to}>
+            <Link onClick={ ( item.handler ) ? item.handler : () => { return false; } } key={'nav'+index} to={item.to}>
                 <ListItem button key={'list-'+index}>
                     <ListItemIcon>{item.icon}</ListItemIcon>
                     <ListItemText primary={item.label} />

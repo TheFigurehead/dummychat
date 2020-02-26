@@ -7,7 +7,8 @@ class DataHandler{
             display_name: user.displayName,
             email: user.email,
             image: user.photoURL,
-            uid: user.uid
+            uid: user.uid,
+            isOnline: Boolean(user.isOnline)
         };
     }
 

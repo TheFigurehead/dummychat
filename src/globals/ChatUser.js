@@ -8,7 +8,9 @@ class ChatUser{
         if(!ChatUser.instance){
 
             this.checkUser = this.checkUser.bind(this);
+            this.disconnectUser = this.disconnectUser.bind(this);
             FirebaseGlobal.onStatusChange(this.checkUser);
+            FirebaseGlobal.onDisconnect(this.disconnectUser);
 
             this.user = false;
 
@@ -19,6 +21,8 @@ class ChatUser{
         return ChatUser.instance;            
 
     }
+
+
 
     checkUser(user){
         if(!user) return false;
@@ -35,6 +39,10 @@ class ChatUser{
                 this.user = DataHandler.userToFormat(user);
             }
         });
+    }
+
+    disconnectUser(){
+        return this.user;
     }
 
 }

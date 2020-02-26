@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -11,13 +11,20 @@ import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import TextField from '@material-ui/core/TextField';
+
+import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state';
+
 import { red } from '@material-ui/core/colors';
 
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 
 import DataHandler from './../../globals/DataHandler';
-import ChatUser from './../../globals/ChatUser';
+
+import ChatUser from '../../globals/ChatUser';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -53,9 +60,41 @@ const getUser = async (props) => {
     return await user;
 }
 
+const timeConverter = (UNIX_timestamp) => {
+  const a = new Date(UNIX_timestamp * 1000);
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const year = a.getFullYear();
+  const month = months[a.getMonth()];
+  const date = a.getDate();
+  const hour = a.getHours();
+  const min = a.getMinutes();
+  const sec = a.getSeconds();
+  const time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
+  return time;
+}
+
 const MessageContent = (props) => {
 
     if(!props.user) return false;
+
+    console.dir(props.user);
+
+    const [mode, setMode] = useState('show');
+    const [editText, setEditText] = useState(props.message.text);
+
+    const onTextChange = (e) => {
+      setEditText(e.target.value);
+    }
+
+    const remove = (id) => {
+      props.remove(id).then(
+          ()=>{
+              console.log('remove');
+          }
+      ).catch((error)=>{
+          console.error("Error removing document: ", error);
+      })
+    }
 
     const classes = useStyles();
 
@@ -77,17 +116,67 @@ const MessageContent = (props) => {
           <CardHeader
             avatar={avatar}
             action={
-              <IconButton aria-label="settings">
-                <MoreVertIcon />
-              </IconButton>
+              <PopupState variant="popover" popupId="demo-popup-menu">
+                {popupState => (
+                  <React.Fragment>
+                    {(()=>{
+                      if(ChatUser.user.uid == props.message.author_id){
+                        return (
+                          <React.Fragment>
+                            <IconButton aria-label="settings" {...bindTrigger(popupState)}>
+                              <MoreVertIcon />
+                            </IconButton>
+                            <Menu {...bindMenu(popupState)}>
+                              <MenuItem onClick={()=>{
+                                popupState.close();
+                                setMode('edit');
+                              }}>Edit</MenuItem>
+                              <MenuItem onClick={()=>{
+                                popupState.close()
+                                remove(props.message.id);
+                              }}>Remove</MenuItem>
+                            </Menu>
+                          </React.Fragment>
+                        );
+                      }
+                    })()}
+                  </React.Fragment>
+                )}
+              </PopupState>
             }
             title={user.display_name}
-            subheader="September 14, 2016"
+            subheader={timeConverter(props.message.timestamp)}
           />
           <CardContent>
-            <Typography variant="body2" color="textSecondary" component="p">
-              {props.message.text}
-            </Typography>
+            {(() => {
+              switch (mode) {
+                case "show": return (
+                  <Typography variant="body2" color="textSecondary" component="p">
+                    {props.message.text}
+                  </Typography>
+                )
+                case "return":
+                default: 
+                  return (
+                    <React.Fragment>
+                      <TextField
+                        multiline
+                        rows="4"
+                        variant="outlined"
+                        value={editText}
+                        onChange={onTextChange}
+                      />
+                      <button onClick={
+                        ()=>{
+                          props.edit(props.message.id, editText).then(()=>{
+                            setMode('show');
+                          });
+                        }
+                      }>Save</button>
+                    </React.Fragment>
+                  );
+              }
+            })()}
           </CardContent>
           <CardActions disableSpacing>
             <IconButton aria-label="add to favorites">
@@ -100,12 +189,12 @@ const MessageContent = (props) => {
 
 const Message = (props) => {
 
-    const [response, setResponse] = useState(<div></div>);
-  
-    getUser(props).then((user) => {
-        const messageContent = <MessageContent message={props.message} user={user} />  
-        setResponse(messageContent);
-    });
+  const [response, setResponse] = useState(<div></div>);
+
+  getUser(props).then((user) => {
+      const messageContent = <MessageContent message={props.message} remove={props.remove} edit={props.edit} user={user} />  
+      setResponse(messageContent);
+  });
 
   return response;
 

@@ -1,14 +1,9 @@
 import React from 'react';
 
 import FirebaseGlobal from './../globals/FirebaseGlobal';
-import ChatUser from './../globals/ChatUser';
-
-import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
 
 import Chat from './Chat.jsx';
 import Auth from './Auth.jsx';
-import User from './User.jsx';
 
 class App extends React.Component {
 
@@ -35,6 +30,44 @@ class App extends React.Component {
             }
         );
 
+        // if(loggedIn){
+
+            // const userStatusFirestoreRef = FirebaseGlobal.firestore.doc('/users/' + user.uid);
+    
+            // const isOfflineForFirestore = {
+            //     isOnline: false,
+            // };
+    
+            // const isOnlineForFirestore = {
+            //     isOnline: true,
+            // };
+
+            // console.dir(FirebaseGlobal.firebase.database().ref('.info/connected'));
+    
+            // FirebaseGlobal.firebase.database().ref('.info/connected').on('value', (snapshot) => {
+            //     console.dir(snapshot);
+            //     if (snapshot.val() == false) {
+            //         // Instead of simply returning, we'll also set Firestore's state
+            //         // to 'offline'. This ensures that our Firestore cache is aware
+            //         // of the switch to 'offline.'
+            //         userStatusFirestoreRef.update(isOfflineForFirestore);
+            //         return;
+            //     };
+
+            //     console.log(snapshot.val());
+                
+            //     userStatusFirestoreRef.update(isOnlineForFirestore);
+
+            //     // userStatusDatabaseRef.onDisconnect().update(isOfflineForDatabase).then(function() {
+            //         // userStatusDatabaseRef.update(isOnlineForDatabase);
+    
+            //         // We'll also add Firestore set here for when we come online.
+            //         // userStatusFirestoreRef.update(isOnlineForFirestore);
+            //     // });
+            // });
+
+        // }
+
     }
 
     render() {
@@ -43,26 +76,6 @@ class App extends React.Component {
         
         if(this.state.loggedIn){
 
-            // component = (
-            //     <Grid 
-            //         container
-            //         direction="row"
-            //         justify="flex-start"
-            //         alignItems="stretch"
-            //         spacing={3}
-            //     >
-            //         <Grid item lg>
-            //             <Paper>
-            //                 <Chat />
-            //             </Paper>
-            //         </Grid>
-            //         <Grid item>
-            //             <Paper>
-            //                 <User user={ChatUser.user} />
-            //             </Paper>
-            //         </Grid>
-            //     </Grid>
-            // );
             component = <Chat />;
 
         }else{

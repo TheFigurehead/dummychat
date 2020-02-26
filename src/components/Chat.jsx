@@ -5,9 +5,14 @@ import {
     Route
 } from "react-router-dom";
 
+import RoomWrapper from './chat/RoomWrapper.jsx';
 import Room from './chat/Room.jsx';
 import RoomsList from './chat/RoomsList.jsx';
 import Navigation from './chat/Navigation.jsx';
+
+import User from './widgets/User.jsx';
+import WidgetsHolder from './widgets/WidgetsHolder.jsx';
+import UsersList from './widgets/UsersList.jsx';
 
 /* material deps */
 
@@ -25,6 +30,7 @@ const drawerWidth = 240;
 const useStyles = makeStyles(theme => ({
   root: {
     display: 'flex',
+    height: '100%'
   },
   appBar: {
     [theme.breakpoints.up('sm')]: {
@@ -42,6 +48,10 @@ const useStyles = makeStyles(theme => ({
   content: {
     flexGrow: 1,
     padding: theme.spacing(3),
+    height: '100%',
+    display: 'inline-flex',
+    flexDirection: 'column',
+    alignItems: 'flex-start'
   },
 }));
 
@@ -85,8 +95,14 @@ const Chat = (props) => {
                         <Route exact path="/rooms">
                             <RoomsList />
                         </Route>
-                        <Route path="/rooms/:id" component={Room}>
-                            <Room />
+                        <Route path="/rooms/:id" component={RoomWrapper}>
+                            <RoomWrapper>
+                              <Room />
+                              <WidgetsHolder>
+                                <User />
+                                <UsersList />
+                              </WidgetsHolder>
+                            </RoomWrapper>
                         </Route>
                     </Switch>
                 </main>

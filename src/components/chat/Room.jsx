@@ -6,8 +6,6 @@ import { withRouter } from "react-router-dom";
 
 import ChatUser from '../../globals/ChatUser';
 
-import Grid from '@material-ui/core/Grid';
-
 import Send from './Send.jsx';
 import Message from './Message.jsx';
 
@@ -23,8 +21,25 @@ class Room extends React.Component{
         }
 
         this.onSend = this.onSend.bind(this);
+        this.onRemove = this.onRemove.bind(this);
+        this.onEdit = this.onEdit.bind(this);
 
         this.id = props.match.params.id;
+
+        this.styles = {
+            wrapper: {
+                display: 'flex',
+                flexDirection: 'column',
+                position: 'relative',
+                flexGrow: 1
+            },
+            messages: {
+                flexWrap: 'nowrap',
+                overflowY: 'auto',
+                flexGrow: 1,
+                paddingBottom: '20px'
+            }
+        }
 
     }
 
@@ -54,28 +69,39 @@ class Room extends React.Component{
         });
     }
 
+    onRemove(doc_id){
+        return FirebaseGlobal.firestore.collection('rooms/'+this.id+'/messages').doc(doc_id).delete();
+    }
+
+    onEdit(doc_id, newText){
+        return FirebaseGlobal.firestore.collection('rooms/'+this.id+'/messages').doc(doc_id).update(
+            {
+                text: newText
+            }
+        );
+    }
+
     render(){
-        
         return (
-            <React.Fragment>
+            <div style={this.styles.wrapper}>
                 <div>Room</div>
                 <h3>Messages</h3>
-                <Grid
-                    container
-                    direction="column"
-                    justify="flex-start"
-                    alignItems="stretch"
+                <div
+                    id="messagesList"
+                    style={this.styles.messages}
                 >
-                    {this.state.messages.map(
-                        (item,i) => {
-                            return (
-                                <Message key={'message-'+i} message={item} />
-                            );    
-                        }
-                    )}
-                </Grid>
-                <Send onSend={this.onSend} />
-            </React.Fragment>
+                    <div>
+                        {this.state.messages.map(
+                            (item,i) => {
+                                return (
+                                    <Message key={'message-'+i} messageID={item.id} message={item} remove={this.onRemove} edit={this.onEdit} />
+                                );    
+                            }
+                        )}
+                    </div>
+                </div>
+                <Send id="sendMessage" onSend={this.onSend} />
+            </div>
         );
     }
 
